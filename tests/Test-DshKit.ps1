@@ -43,7 +43,7 @@ foreach ($file in $cmd + $vbs) {
 $sync = Join-Path $repo 'src\Sync-DshKit.ps1'
 $versionOut = & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $sync -Action Version 2>&1
 Assert-True ($LASTEXITCODE -eq 0) "Windows PowerShell 5.1 runs Sync-DshKit.ps1 (exit $LASTEXITCODE)"
-Assert-True (($versionOut -join "`n") -match 'DshKit 1\.0\.4') 'version output is 1.0.4'
+Assert-True (($versionOut -join "`n") -match 'DshKit 1\.0\.5') 'version output is 1.0.5'
 
 $temp = Join-Path $env:TEMP ('dshkit-test-' + [guid]::NewGuid().ToString('N'))
 try {
@@ -51,7 +51,7 @@ try {
     New-Item -ItemType Directory -Path (Join-Path $temp 'storages') -Force | Out-Null
     $statusOut = & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $sync -Action Status -KitRoot $temp -DshHome $temp 2>&1
     Assert-True ($LASTEXITCODE -eq 0) "Status exits 0 (exit $LASTEXITCODE)"
-    Assert-True (($statusOut -join "`n") -match 'DshKit 1\.0\.4') 'Status prints version'
+    Assert-True (($statusOut -join "`n") -match 'DshKit 1\.0\.5') 'Status prints version'
 } finally {
     Remove-Item -LiteralPath $temp -Recurse -Force -ErrorAction SilentlyContinue
 }
@@ -82,6 +82,33 @@ try {
     Assert-True ((Get-Content -LiteralPath $dstFile2 -Raw).Trim() -eq 'COPY') 'Push copies a new session file'
 } finally {
     Remove-Item -LiteralPath $root2 -Recurse -Force -ErrorAction SilentlyContinue
+}
+
+$csc = Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
+if (Test-Path -LiteralPath $csc) {
+    $root3 = Join-Path $env:TEMP ('dshkit-launcher-' + [guid]::NewGuid().ToString('N'))
+    $kit3 = Join-Path $root3 'kit'
+    $dsh3 = Join-Path $root3 'dsh'
+    $fake = Join-Path $root3 'FakeDsh.exe'
+    try {
+        New-Item -ItemType Directory -Path $kit3 -Force | Out-Null
+        New-Item -ItemType Directory -Path (Join-Path $dsh3 'profiles\desktop\node_modules') -Force | Out-Null
+        Copy-Item -Path (Join-Path $repo 'src\*') -Destination $kit3 -Force
+        @{ version = '1.0.5'; kitRoot = $kit3; dshHome = $dsh3; dshExe = $fake; profile = 'desktop'; processName = 'FakeDsh' } |
+            ConvertTo-Json | Set-Content -LiteralPath (Join-Path $kit3 'config.json') -Encoding UTF8
+        $cs = Join-Path $root3 'fake.cs'
+        'public class FakeDsh { public static void Main() { System.Threading.Thread.Sleep(3000); } }' | Set-Content -LiteralPath $cs -Encoding ASCII
+        & $csc /nologo /target:exe /out:$fake $cs | Out-Null
+        Assert-True (Test-Path -LiteralPath $fake) 'launcher test fake executable compiled'
+        $launcherOut = & powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $kit3 'Start-DshSynced.ps1') 2>&1
+        Assert-True ($LASTEXITCODE -eq 0) "launcher exits 0 (exit $LASTEXITCODE)"
+        Assert-True (Test-Path -LiteralPath (Join-Path $kit3 'state\last-push.json')) 'launcher pushes after fake DSH exits'
+        Assert-True (($launcherOut -join "`n") -match 'Push after exit') 'launcher reaches Push stage'
+    } finally {
+        Remove-Item -LiteralPath $root3 -Recurse -Force -ErrorAction SilentlyContinue
+    }
+} else {
+    Write-Host 'skip launcher test: csc.exe not found'
 }
 
 if ($failures -gt 0) {

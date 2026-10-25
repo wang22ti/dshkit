@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.5 — 2026-10-26
+
+- Fix the launcher passing `-Action` as a positional value (array splatting) by switching `Invoke-Sync` to hashtable splatting. The previous launcher could fail with "The argument '-Action' does not belong to the set...".
+- Add an end-to-end launcher test using a compiled fake DSH executable.
+
 ## 1.0.4 — 2026-10-26
 
 - Fix the installer's final message to point at the **DeepSeek Harness** synced entry instead of the removed `DSH - DshKit` name.

@@ -25,10 +25,11 @@ function Test-DshRunning {
 }
 
 function Invoke-Sync([string]$SyncAction) {
-    $syncArgs = @('-Action', $SyncAction, '-KitRoot', $Root)
-    if ($DshHome) { $syncArgs += @('-DshHome', $DshHome) }
-    if ($DshProfile) { $syncArgs += @('-Profile', $DshProfile) }
-    & $Sync @syncArgs
+    # Hashtable splatting is required here: array splatting passes "-Action" as a positional value.
+    $syncParams = @{ Action = $SyncAction; KitRoot = $Root }
+    if ($DshHome) { $syncParams.DshHome = $DshHome }
+    if ($DshProfile) { $syncParams.Profile = $DshProfile }
+    & $Sync @syncParams
 }
 
 if (-not (Test-Path -LiteralPath $Exe)) {

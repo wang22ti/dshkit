@@ -47,7 +47,7 @@ Get-ChildItem -LiteralPath $Source -File | ForEach-Object {
 $ConfigPath = Join-Path $KitRoot 'config.json'
 if (-not (Test-Path -LiteralPath $ConfigPath) -or $Force) {
     [ordered]@{
-        version     = '1.0.4'
+        version     = '1.0.5'
         kitRoot     = $KitRoot
         dshHome     = $DshHome
         dshExe      = $DshExe
