@@ -1,0 +1,7 @@
+config.json
+*.log
+release/
+*.zip
+.DS_Store
+Thumbs.db
+.vs/
