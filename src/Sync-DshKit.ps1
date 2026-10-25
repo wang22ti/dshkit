@@ -8,7 +8,7 @@
 )
 
 $ErrorActionPreference = 'Stop'
-$script:Version = '1.0.3'
+$script:Version = '1.0.4'
 
 if (-not $KitRoot) {
     $KitRoot = if ($PSScriptRoot) { $PSScriptRoot } else { (Get-Location).Path }

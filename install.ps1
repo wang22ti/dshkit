@@ -47,7 +47,7 @@ Get-ChildItem -LiteralPath $Source -File | ForEach-Object {
 $ConfigPath = Join-Path $KitRoot 'config.json'
 if (-not (Test-Path -LiteralPath $ConfigPath) -or $Force) {
     [ordered]@{
-        version     = '1.0.3'
+        version     = '1.0.4'
         kitRoot     = $KitRoot
         dshHome     = $DshHome
         dshExe      = $DshExe
@@ -101,4 +101,4 @@ Write-Host '第一台机器（已有 DSH 数据）建议：'
 Write-Host "  .\install.ps1 -InitialPush"
 Write-Host '第二台机器（从 DshKit 取数据）建议：'
 Write-Host "  .\install.ps1 -InitialPull"
-Write-Host '之后统一使用「DSH - DshKit」入口。'
+Write-Host '之后统一使用「DeepSeek Harness」同步入口。'

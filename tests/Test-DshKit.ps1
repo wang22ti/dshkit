@@ -43,7 +43,7 @@ foreach ($file in $cmd + $vbs) {
 $sync = Join-Path $repo 'src\Sync-DshKit.ps1'
 $versionOut = & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $sync -Action Version 2>&1
 Assert-True ($LASTEXITCODE -eq 0) "Windows PowerShell 5.1 runs Sync-DshKit.ps1 (exit $LASTEXITCODE)"
-Assert-True (($versionOut -join "`n") -match 'DshKit 1\.0\.3') 'version output is 1.0.3'
+Assert-True (($versionOut -join "`n") -match 'DshKit 1\.0\.4') 'version output is 1.0.4'
 
 $temp = Join-Path $env:TEMP ('dshkit-test-' + [guid]::NewGuid().ToString('N'))
 try {
@@ -51,7 +51,7 @@ try {
     New-Item -ItemType Directory -Path (Join-Path $temp 'storages') -Force | Out-Null
     $statusOut = & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $sync -Action Status -KitRoot $temp -DshHome $temp 2>&1
     Assert-True ($LASTEXITCODE -eq 0) "Status exits 0 (exit $LASTEXITCODE)"
-    Assert-True (($statusOut -join "`n") -match 'DshKit 1\.0\.3') 'Status prints version'
+    Assert-True (($statusOut -join "`n") -match 'DshKit 1\.0\.4') 'Status prints version'
 } finally {
     Remove-Item -LiteralPath $temp -Recurse -Force -ErrorAction SilentlyContinue
 }

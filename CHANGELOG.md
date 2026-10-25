@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.4 — 2026-10-26
+
+- Fix the installer's final message to point at the **DeepSeek Harness** synced entry instead of the removed `DSH - DshKit` name.
+
 ## 1.0.3 — 2026-10-25
 
 - Remove a test fixture that contained a fragment of a local Windows user name.
